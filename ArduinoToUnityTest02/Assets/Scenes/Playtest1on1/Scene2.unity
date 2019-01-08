@@ -4665,7 +4665,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arduinoInput: {fileID: 0}
-  speed: 10
+  speed: 5
   mirrorRot: 1
   onButtonGyroRot: {x: 0, y: 0, z: 0}
   lastRot: {x: 0, y: 0, z: 0}

@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class PlanetRotation : ArduinoManager {
+//put this script on a parent object that has a child that needs to rotate
+public class PlanetRotationV2 : ArduinoManager {
     public float speed;
     public bool mirrorRot;
     public Vector3 onButtonGyroRot;
@@ -10,27 +10,30 @@ public class PlanetRotation : ArduinoManager {
     public Vector3 wantedRot;
     public bool setLastRot;
     public bool wind = false;
+    private GameObject myChild;
 
     private bool rotResetOnButton;
 
     private void Start() {
         setLastRot = false;
+        myChild = transform.GetChild(0).gameObject;
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update() {
         if (wind) mirrorRot = false;
         if ((arduinoInput.button0 && mirrorRot) || wind) {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler
             (arduinoInput.gyroRot.x, arduinoInput.gyroRot.y, arduinoInput.gyroRot.z), Time.deltaTime * speed);
-            
+
         }
 
 
 
         if (!mirrorRot) {
             if (!arduinoInput.button0 && !setLastRot) {
-                lastRot = transform.eulerAngles;
+                lastRot = new Vector3(myChild.transform.eulerAngles.x, myChild.transform.eulerAngles.y,
+                    myChild.transform.eulerAngles.z);
                 setLastRot = true;
                 rotResetOnButton = true;
                 Debug.Log("No Button Pressed");
@@ -43,11 +46,14 @@ public class PlanetRotation : ArduinoManager {
                     rotResetOnButton = false;
                 }
 
-                wantedRot = arduinoInput.gyroRot - onButtonGyroRot + lastRot;   
+                wantedRot = arduinoInput.gyroRot - onButtonGyroRot + lastRot;
 
-                transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler
-                (wantedRot.x, wantedRot.y, 
+                myChild.transform.localRotation = Quaternion.Slerp(myChild.transform.localRotation, Quaternion.Euler
+                (myChild.transform.localRotation.x, wantedRot.y,
                 wantedRot.z), Time.deltaTime * speed);
+                transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler
+                (wantedRot.x, transform.localRotation.y,
+                transform.localRotation.z), Time.deltaTime * speed);
                 Debug.Log("Button Holding");
             }
         }
